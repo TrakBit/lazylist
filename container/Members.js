@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, Text, View, FlatList} from 'react-native';
+import {StyleSheet, FlatList} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {List, ListItem} from 'react-native-elements'
+import {List, ListItem} from 'react-native-elements';
 import {getMembers} from '../actions/member';
 
 class Members extends Component {
@@ -11,31 +11,30 @@ class Members extends Component {
         this.props.actions.getMembers();
     }
 
-     _keyExtractor = (item, index) => item._id
+     _keyExtractor = (item) => item._id
 
      _renderItem = ({item}) => {
-         console.log(item);
          return (
-        <ListItem
-            roundAvatar
-            title={`${item.first_name} ${item.last_name}`}
-            subtitle={item.email}
-            avatar={{uri: item.image_url}}
-          />
-         )
+             <ListItem
+                 roundAvatar={true}
+                 title={`${item.first_name} ${item.last_name}`}
+                 subtitle={item.email}
+                 avatar={{uri: item.image_url}}
+             />
+         );
      };
 
-    render() {
-        return (
-            <List style={styles.container}>
-              <FlatList
-                  data={this.props.member}
-                  keyExtractor={this._keyExtractor}
-                  renderItem={this._renderItem}
-              />
-            </List>
-        );
-    }
+     render() {
+         return (
+             <List style={styles.container}>
+                 <FlatList
+                     data={this.props.member}
+                     keyExtractor={this._keyExtractor}
+                     renderItem={this._renderItem}
+                 />
+             </List>
+         );
+     }
 }
 
 const styles = StyleSheet.create({
@@ -45,11 +44,12 @@ const styles = StyleSheet.create({
     }
 });
 
-const {func, shape} = PropTypes;
+const {func, shape, array} = PropTypes;
 Members.propTypes = {
     actions: shape({
         getMembers: func.isRequired
-    })
+    }),
+    member: array
 };
 
 const mapStateToProps = (state) => ({
