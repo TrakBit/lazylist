@@ -4,16 +4,17 @@ import {StyleSheet, FlatList} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {List, ListItem} from 'react-native-elements';
-import {getMembers} from '../actions/member';
+import {getMembersSome, getMembersAll} from '../actions/member';
 
 class Members extends Component {
     componentDidMount() {
-        this.props.actions.getMembers();
+        this.props.actions.getMembersSome();
+        this.props.actions.getMembersAll();
     }
 
      _keyExtractor = (item) => item._id
 
-     _renderItem = ({item}) => {
+     _renderMember = ({item}) => {
          return (
              <ListItem
                  roundAvatar={true}
@@ -30,7 +31,7 @@ class Members extends Component {
                  <FlatList
                      data={this.props.member}
                      keyExtractor={this._keyExtractor}
-                     renderItem={this._renderItem}
+                     renderItem={this._renderMember}
                  />
              </List>
          );
@@ -47,9 +48,10 @@ const styles = StyleSheet.create({
 const {func, shape, array} = PropTypes;
 Members.propTypes = {
     actions: shape({
-        getMembers: func.isRequired
+        getMembersSome: func.isRequired,
+        getMembersAll: func.isRequired
     }),
-    member: array
+    member: array.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -58,7 +60,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators({
-        getMembers
+        getMembersSome,
+        getMembersAll
     }, dispatch)
 });
 
