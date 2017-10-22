@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, FlatList} from 'react-native';
+import {StyleSheet, FlatList, View} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {List, ListItem} from 'react-native-elements';
+import {List, ListItem, SearchBar} from 'react-native-elements';
 import {getMembersSome, getMembersAll} from '../actions/member';
 
 class Members extends Component {
@@ -28,6 +28,16 @@ class Members extends Component {
      render() {
          return (
              <List style={styles.container}>
+                 <ListItem
+                     title={
+                         <View>
+                             <SearchBar
+                                 lightTheme={true}
+                                 placeholder='Type Here...'
+                             />
+                         </View>
+                     }
+                 />
                  <FlatList
                      data={this.props.member}
                      keyExtractor={this._keyExtractor}
