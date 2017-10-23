@@ -14,8 +14,8 @@ class Members extends Component {
         };
     }
 
-    componentDidMount() {
-        this.props.actions.getMembersPage1();
+    async componentDidMount() {
+        await this.props.actions.getMembersPage1();
         this.props.actions.getMembersPage2();
     }
 
