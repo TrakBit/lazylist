@@ -1,27 +1,49 @@
+//@flow
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {StyleSheet, FlatList} from 'react-native';
-import {bindActionCreators} from 'redux';
+import {bindActionCreators, type Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import {List, ListItem, SearchBar, ButtonGroup} from 'react-native-elements';
 import {getMembersPage1, getMembersPage2, getMembersSearch} from '../actions/member';
+import type {State} from '../types/State';
+import type {
+    Action,
+    GET_MEMBERS_ACTION,
+    SEARCH_MEMBERS_ACTION
+} from '../types/Action';
+import type {Member} from '../types/Member';
 
-class Members extends Component {
-    constructor() {
-        super();
+type MemberState = {
+  selectedFilter: number
+}
+
+type Props = {
+  member: Member,
+  actions: {
+      getMembersPage1: () => GET_MEMBERS_ACTION,
+      getMembersPage2: () => GET_MEMBERS_ACTION,
+      getMembersSearch: (string, number) => SEARCH_MEMBERS_ACTION,
+    }
+};
+
+class Members extends Component<Props, MemberState> {
+    constructor(props: Props) {
+        super(props);
         this.state = {
             selectedFilter: 0
         };
     }
 
+    //$FlowFixMe
     async componentDidMount() {
         await this.props.actions.getMembersPage1();
         this.props.actions.getMembersPage2();
     }
 
-     _keyExtractor = (item) => item._id
+     _keyExtractor = (item: Member) => item._id
 
-     _renderMember = ({item}) => {
+     _renderMember = ({item}: {item: Member}) => {
          return (
              <ListItem
                  roundAvatar={true}
@@ -32,12 +54,12 @@ class Members extends Component {
          );
      };
 
-     _changeFilter = (selectedFilter) => this.setState({selectedFilter});
+     _changeFilter = (selectedFilter: number) => this.setState({selectedFilter});
 
-     _search = (text) => {
+     _search = (text: string) => {
          const {selectedFilter} = this.state;
          if (selectedFilter === 0) {
-             const searchText = (text).toLowerCase();
+             const searchText: string = (text).toLowerCase();
              this.props.actions.getMembersSearch(searchText, 0);
          } else if (selectedFilter === 1) {
              this.props.actions.getMembersSearch(text, 1);
@@ -56,7 +78,7 @@ class Members extends Component {
                          <SearchBar
                              lightTheme={true}
                              placeholder='Type Here...'
-                             onChangeText={(text) => this._search(text)}
+                             onChangeText={(text: string) => this._search(text)}
                          />
                      }
                  />
@@ -92,11 +114,11 @@ Members.propTypes = {
     member: array.isRequired
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: State) => ({
     member: state.memberReducer
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: Dispatch<State, Action>) => ({
     actions: bindActionCreators({
         getMembersPage1,
         getMembersPage2,
