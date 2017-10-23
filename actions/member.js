@@ -1,5 +1,5 @@
 //@flow
-import {getMembersDataPage1, getMembersDataPage2, getMembersDataSearch} from '../api/member';
+import {getMembersDataPage, getMembersDataMore, getMembersDataSearch} from '../api/member';
 import {GET_MEMBERS, SEARCH_MEMBERS} from '../constants/member';
 import type {Dispatch} from 'redux';
 import type {
@@ -12,19 +12,19 @@ type Data = {
   data: Members
 }
 
-export const getMembersPage1 = () => (
+export const getMembersPage = () => (
     async (dispatch: Dispatch<GET_MEMBERS_ACTION>) => {
         //$FlowFixMe
-        const data: Data = await getMembersDataPage1();
+        const data: Data = await getMembersDataPage();
         const members: Members = data.data;
         dispatch({type: GET_MEMBERS, members});
     }
 );
 
-export const getMembersPage2 = () => (
+export const getMembersMore = (page: number) => (
     async (dispatch: Dispatch<GET_MEMBERS_ACTION>) => {
         //$FlowFixMe
-        const data: Data = await getMembersDataPage2();
+        const data: Data = await getMembersDataMore(page);
         const members: Members = data.data;
         dispatch({type: GET_MEMBERS, members});
     }

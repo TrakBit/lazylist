@@ -1,11 +1,11 @@
 //@flow
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, FlatList} from 'react-native';
+import {StyleSheet, FlatList, View} from 'react-native';
 import {bindActionCreators, type Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import {List, ListItem, SearchBar, ButtonGroup} from 'react-native-elements';
-import {getMembersPage1, getMembersPage2, getMembersSearch} from '../actions/member';
+import {getMembersPage, getMembersMore, getMembersSearch} from '../actions/member';
 import type {State} from '../types/State';
 import type {
     Action,
@@ -15,14 +15,16 @@ import type {
 import type {Member} from '../types/Member';
 
 type MemberState = {
-  selectedFilter: number
+  bottomReached: boolean,
+  selectedFilter: number,
+  page: number
 }
 
 type Props = {
   member: Member,
   actions: {
-      getMembersPage1: () => GET_MEMBERS_ACTION,
-      getMembersPage2: () => GET_MEMBERS_ACTION,
+      getMembersPage: () => GET_MEMBERS_ACTION,
+      getMembersMore: (number) => GET_MEMBERS_ACTION,
       getMembersSearch: (string, number) => SEARCH_MEMBERS_ACTION,
     }
 };
@@ -31,14 +33,14 @@ class Members extends Component<Props, MemberState> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedFilter: 0
+            selectedFilter: 0,
+            bottomReached: true,
+            page: 1
         };
     }
 
-    //$FlowFixMe
-    async componentDidMount() {
-        await this.props.actions.getMembersPage1();
-        this.props.actions.getMembersPage2();
+    componentDidMount() {
+        this.props.actions.getMembersPage();
     }
 
      _keyExtractor = (item: Member) => item._id
@@ -68,6 +70,16 @@ class Members extends Component<Props, MemberState> {
          }
      }
 
+     onEndReachedCalledDuringMomentum = true;
+
+     _loadMoreMembers = () => {
+         if (!this.onEndReachedCalledDuringMomentum) {
+             const {page} = this.state;
+             this.setState({page: page + 1});
+             this.props.actions.getMembersMore(page + 1);
+         }
+     }
+
      render() {
          const buttons = ['Email', 'First Name', 'Last Name'];
          const {selectedFilter} = this.state;
@@ -87,11 +99,20 @@ class Members extends Component<Props, MemberState> {
                      selectedIndex={selectedFilter}
                      buttons={buttons}
                  />
-                 <FlatList
-                     data={this.props.member}
-                     keyExtractor={this._keyExtractor}
-                     renderItem={this._renderMember}
-                 />
+                 <View>
+                     <FlatList
+                         data={this.props.member}
+                         keyExtractor={this._keyExtractor}
+                         renderItem={this._renderMember}
+                         onEndThreshold={0}
+                         onEndReached={() => {
+                             this._loadMoreMembers();
+                         }}
+                         onMomentumScrollBegin={() => {
+                             this.onEndReachedCalledDuringMomentum = false;
+                         }}
+                     />
+                 </View>
              </List>
          );
      }
@@ -107,8 +128,8 @@ const styles = StyleSheet.create({
 const {func, shape, array} = PropTypes;
 Members.propTypes = {
     actions: shape({
-        getMembersPage1: func.isRequired,
-        getMembersPage2: func.isRequired,
+        getMembersPage: func.isRequired,
+        getMembersMore: func.isRequired,
         getMembersSearch: func.isRequired
     }),
     member: array.isRequired
@@ -120,8 +141,8 @@ const mapStateToProps = (state: State) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch<State, Action>) => ({
     actions: bindActionCreators({
-        getMembersPage1,
-        getMembersPage2,
+        getMembersPage,
+        getMembersMore,
         getMembersSearch
     }, dispatch)
 });

@@ -11,7 +11,7 @@ export const memberReducer = (
     case GET_MEMBERS:
         return [...state, ...action.members];
     case SEARCH_MEMBERS:
-        return action.members;
+        return [...action.members];
     default:
         return state;
     }
