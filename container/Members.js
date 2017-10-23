@@ -1,16 +1,16 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, FlatList, View} from 'react-native';
+import {StyleSheet, FlatList} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {List, ListItem, SearchBar, ButtonGroup} from 'react-native-elements';
-import {getMembersPage1, getMembersPage2} from '../actions/member';
+import {getMembersPage1, getMembersPage2, getMembersSearch} from '../actions/member';
 
 class Members extends Component {
     constructor() {
         super();
         this.state = {
-            selectedIndex: 1
+            selectedFilter: 0
         };
     }
 
@@ -32,27 +32,39 @@ class Members extends Component {
          );
      };
 
+     _changeFilter = (selectedFilter) => this.setState({selectedFilter});
+
+     _search = (text) => {
+         const {selectedFilter} = this.state;
+         if (selectedFilter === 0) {
+             const searchText = (text).toLowerCase();
+             this.props.actions.getMembersSearch(searchText, 0);
+         } else if (selectedFilter === 1) {
+             this.props.actions.getMembersSearch(text, 1);
+         } else if (selectedFilter === 2) {
+             this.props.actions.getMembersSearch(text, 2);
+         }
+     }
+
      render() {
          const buttons = ['Email', 'First Name', 'Last Name'];
-         const {selectedIndex} = this.state;
+         const {selectedFilter} = this.state;
          return (
              <List style={styles.container}>
                  <ListItem
                      title={
-                         <View>
-                             <SearchBar
-                                 lightTheme={true}
-                                 placeholder='Type Here...'
-                             />
-                         </View>
+                         <SearchBar
+                             lightTheme={true}
+                             placeholder='Type Here...'
+                             onChangeText={(text) => this._search(text)}
+                         />
                      }
                  />
-                 <View>
-                     <ButtonGroup
-                         selectedIndex={selectedIndex}
-                         buttons={buttons}
-                     />
-                 </View>
+                 <ButtonGroup
+                     onPress={(val) => this._changeFilter(val)}
+                     selectedIndex={selectedFilter}
+                     buttons={buttons}
+                 />
                  <FlatList
                      data={this.props.member}
                      keyExtractor={this._keyExtractor}
@@ -74,7 +86,8 @@ const {func, shape, array} = PropTypes;
 Members.propTypes = {
     actions: shape({
         getMembersPage1: func.isRequired,
-        getMembersPage2: func.isRequired
+        getMembersPage2: func.isRequired,
+        getMembersSearch: func.isRequired
     }),
     member: array.isRequired
 };
@@ -86,7 +99,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators({
         getMembersPage1,
-        getMembersPage2
+        getMembersPage2,
+        getMembersSearch
     }, dispatch)
 });
 
