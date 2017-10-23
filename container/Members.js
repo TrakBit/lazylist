@@ -3,13 +3,20 @@ import PropTypes from 'prop-types';
 import {StyleSheet, FlatList, View} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {List, ListItem, SearchBar} from 'react-native-elements';
-import {getMembersSome, getMembersAll} from '../actions/member';
+import {List, ListItem, SearchBar, ButtonGroup} from 'react-native-elements';
+import {getMembersPage1, getMembersPage2} from '../actions/member';
 
 class Members extends Component {
+    constructor() {
+        super();
+        this.state = {
+            selectedIndex: 1
+        };
+    }
+
     componentDidMount() {
-        this.props.actions.getMembersSome();
-        this.props.actions.getMembersAll();
+        this.props.actions.getMembersPage1();
+        this.props.actions.getMembersPage2();
     }
 
      _keyExtractor = (item) => item._id
@@ -26,6 +33,8 @@ class Members extends Component {
      };
 
      render() {
+         const buttons = ['Email', 'First Name', 'Last Name'];
+         const {selectedIndex} = this.state;
          return (
              <List style={styles.container}>
                  <ListItem
@@ -38,6 +47,12 @@ class Members extends Component {
                          </View>
                      }
                  />
+                 <View>
+                     <ButtonGroup
+                         selectedIndex={selectedIndex}
+                         buttons={buttons}
+                     />
+                 </View>
                  <FlatList
                      data={this.props.member}
                      keyExtractor={this._keyExtractor}
@@ -58,8 +73,8 @@ const styles = StyleSheet.create({
 const {func, shape, array} = PropTypes;
 Members.propTypes = {
     actions: shape({
-        getMembersSome: func.isRequired,
-        getMembersAll: func.isRequired
+        getMembersPage1: func.isRequired,
+        getMembersPage2: func.isRequired
     }),
     member: array.isRequired
 };
@@ -70,8 +85,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators({
-        getMembersSome,
-        getMembersAll
+        getMembersPage1,
+        getMembersPage2
     }, dispatch)
 });
 

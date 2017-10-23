@@ -6,7 +6,7 @@ export const memberReducer = (
 ) => {
     switch (action.type) {
     case GET_MEMBERS:
-        return action.members;
+        return [...state, ...action.members];
     default:
         return state;
     }
